@@ -6,29 +6,35 @@ from cricket_pose_utils import analyze_video_vs_ideal
 with open('utils/scenario_mapping.json') as f:
     scenario_mapping = json.load(f)
 
-st.title("🏏 Health Timeout Technique Analyzer")
+st.title("🏏 Health Timeout Cricket Technique Analyzer")
 
-# Select activity type first
-selected_category = st.selectbox("Choose activity type:", list(scenario_mapping.keys()))
+scenario = st.selectbox("Select Scenario:", options=list(scenario_mapping.keys()))
+option = st.selectbox("Select Option:", options=scenario_mapping[scenario])
 
-# Then select scenario under that category
-selected_scenario = st.selectbox(f"Select {selected_category} scenario:", list(scenario_mapping[selected_category].keys()))
-ideal_video_url = scenario_mapping[selected_category][selected_scenario]
+uploaded_video = st.file_uploader("Upload your video (MP4 format)", type=["mp4"])
 
-# Upload user video
-user_video = st.file_uploader("Upload your cricket video (mp4)", type=['mp4'])
-
-if st.button("Analyze") and user_video:
+if st.button("Analyze") and uploaded_video is not None:
     with open("temp_user_video.mp4", "wb") as f:
-        f.write(user_video.read())
+        f.write(uploaded_video.read())
 
-    st.info("Analyzing... please wait ⏳")
-    result = analyze_video_vs_ideal("temp_user_video.mp4", ideal_video_url)
+    ideal_video_url = scenario_mapping[scenario][option]
 
-    st.success(f"Pose Similarity Score: {result['score']} / 100")
-    st.write("**Body Parts Needing Improvement:**")
-    if result['issues']:
-        for issue in result['issues']:
-            st.write(f"- {issue}")
+    st.info("Processing video — please wait, this may take a moment...")
+
+    score, issues = analyze_video_vs_ideal("temp_user_video.mp4", ideal_video_url)
+
+    st.subheader(f"Technique Score: {score:.2f}/100")
+
+    if issues:
+        for issue in issues:
+            if 'error' in issue:
+                st.error(issue['error'])
+            else:
+                st.write(f"📸 Frame {issue['frame']}:")
+                for problem in issue['problems']:
+                    st.write(f"🔴 {problem['joint']}: {problem['issue']}")
+
     else:
-        st.write("✅ No major issues detected!")
+        st.success("No issues detected — great job!")
+
+    st.info("Done analyzing.")
