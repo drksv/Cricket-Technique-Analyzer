@@ -1,0 +1,10 @@
+{
+  "batting": {
+    "pull_shot": "https://drive.google.com/file/d/1w2EsIYRnHPiMtZlgo5d_FlBWgVqaYd1r/view?usp=sharing",
+    "cover_drive": "https://drive.google.com/file/d/1OP0U5OPy9x6JniaG4vJMV5KxCAeF0GUM/view?usp=sharing"
+  },
+  "bowling": {
+    "yorker": "https://drive.google.com/file/d/1ANTQ8j1JplsSv3sJz6Lbtgm71BHsIxl5/view?usp=sharing",
+    "bouncer": "https://drive.google.com/file/d/15giiE0qHC43XO0uXULW_n1FVJGLDGi77/view?usp=sharing"
+  }
+}
