@@ -8,33 +8,29 @@ with open('utils/scenario_mapping.json') as f:
 
 st.title("🏏 Health Timeout Cricket Technique Analyzer")
 
-scenario = st.selectbox("Select Scenario:", options=list(scenario_mapping.keys()))
-option = st.selectbox("Select Option:", options=scenario_mapping[scenario])
+st.sidebar.header("Select Scenario")
+scenario_type = st.sidebar.selectbox("Type", list(scenario_mapping.keys()))
+scenario_option = st.sidebar.selectbox("Scenario", scenario_mapping[scenario_type])
 
-uploaded_video = st.file_uploader("Upload your video (MP4 format)", type=["mp4"])
+# Load ideal video URL from secrets
+ideal_video_url = st.secrets["video_links"][scenario_option]
 
-if st.button("Analyze") and uploaded_video is not None:
+# Upload user video
+uploaded_video = st.file_uploader("Upload your video (MP4)", type=["mp4"])
+
+if uploaded_video is not None:
     with open("temp_user_video.mp4", "wb") as f:
         f.write(uploaded_video.read())
 
-    ideal_video_url = scenario_mapping[scenario][option]
+    st.success("Video uploaded. Running analysis...")
 
-    st.info("Processing video — please wait, this may take a moment...")
+    result = analyze_video_vs_ideal("temp_user_video.mp4", ideal_video_url)
 
-    score, issues = analyze_video_vs_ideal("temp_user_video.mp4", ideal_video_url)
+    st.write("### 📊 Result")
+    st.write(f"**Score:** {result['score']}%")
 
-    st.subheader(f"Technique Score: {score:.2f}/100")
+    st.write("### ⚠️ Areas to Improve")
+    for issue in result["issues"]:
+        st.write(f"- {issue}")
 
-    if issues:
-        for issue in issues:
-            if 'error' in issue:
-                st.error(issue['error'])
-            else:
-                st.write(f"📸 Frame {issue['frame']}:")
-                for problem in issue['problems']:
-                    st.write(f"🔴 {problem['joint']}: {problem['issue']}")
 
-    else:
-        st.success("No issues detected — great job!")
-
-    st.info("Done analyzing.")
