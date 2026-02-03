@@ -1,7 +1,8 @@
 {
   "batting": ["pull_shot", "cover_drive"],
-  "bowling": ["yorker", "bouncer", "left_arm_spin"]
+  "bowling": ["yorker", "bouncer"]
 }
+
 
 
 
